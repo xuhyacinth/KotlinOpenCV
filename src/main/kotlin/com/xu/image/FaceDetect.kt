@@ -1,5 +1,6 @@
 package com.xu.com.xu.image
 
+import org.opencv.core.Core
 import org.opencv.core.MatOfRect
 import org.opencv.core.Point
 import org.opencv.core.Scalar
@@ -17,12 +18,13 @@ object FaceDetect {
         val type = System.getProperty("sun.arch.data.model")
         if (os.uppercase(Locale.getDefault()).contains("WINDOWS")) {
             val lib = if (type.endsWith("64")) {
-                File("lib\\opencv-4.9\\x64\\" + System.mapLibraryName("opencv_java4100"))
+                File("lib\\opencv-4.9\\x64\\" + System.mapLibraryName(Core.NATIVE_LIBRARY_NAME))
             } else {
-                File("lib\\opencv-4.9\\x86\\" + System.mapLibraryName("opencv_java4100"))
+                File("lib\\opencv-4.9\\x86\\" + System.mapLibraryName(Core.NATIVE_LIBRARY_NAME))
             }
             System.load(lib.absolutePath)
         }
+        println(Core.VERSION)
     }
 
     @JvmStatic
@@ -31,8 +33,8 @@ object FaceDetect {
     }
 
     private fun face() {
-        val facebook = CascadeClassifier("lib/opencv/data/haarcascades/haarcascade_frontalcatface_extended.xml")
-        val image = Imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\2.png")
+        val facebook = CascadeClassifier("lib/opencv-4.9/data/haarcascades/haarcascade_frontalcatface_extended.xml")
+        val image = Imgcodecs.imread("lib/data/image/2.png")
         val face = MatOfRect()
         facebook.detectMultiScale(image, face)
         val reacts = face.toArray()

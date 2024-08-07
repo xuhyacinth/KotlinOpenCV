@@ -32,7 +32,7 @@ object Tracking {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val video = VideoCapture("C:\\Users\\xuyq\\Desktop\\cup.mp4")
+        val video = VideoCapture("lib/data/video/cup.mp4")
         // 第一帧影像
         val first = Mat()
         video.read(first)
