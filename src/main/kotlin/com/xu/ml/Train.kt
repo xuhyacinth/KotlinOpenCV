@@ -37,14 +37,13 @@ object Train {
 
         // 创建和训练模型
         val model = DTrees.create()
-        model.maxDepth = 10
+        model.maxDepth = 50
         model.minSampleCount = 2
         model.useSurrogates = false
         model.cvFolds = 0
         model.use1SERule = false
         model.truncatePrunedTree = false
         model.regressionAccuracy = 0.01f
-        //model.save("lib/data/image/ml/DTrees.xml")
 
         // 转换为OpenCV的Mat格式
         val trainImagesData = Mat(trainImages.size, 784, CvType.CV_32F)
@@ -56,12 +55,13 @@ object Train {
 
         // 训练模型
         model.train(trainImagesData, Ml.ROW_SAMPLE, trainLabelsData)
+        model.save("lib/data/image/ml/DTrees.xml")
 
-        // 评估训练集准确率
+        // 练集准确率
         val train = accuracy(model, trainImages, trainLabels)
         println("Training Accuracy: $train")
 
-        // 评估测试集准确率
+        // 试集准确率
         val test = accuracy(model, testImages, testLabels)
         println("Test Accuracy: $test")
     }
