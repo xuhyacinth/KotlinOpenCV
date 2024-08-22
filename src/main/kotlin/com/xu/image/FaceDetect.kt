@@ -24,7 +24,7 @@ object FaceDetect {
             }
             System.load(lib.absolutePath)
         }
-        println(Core.VERSION)
+        println("OpenCV: ${Core.VERSION}")
     }
 
     @JvmStatic
@@ -38,7 +38,7 @@ object FaceDetect {
         val face = MatOfRect()
         facebook.detectMultiScale(image, face)
         val reacts = face.toArray()
-        println("匹配到 " + reacts.size + " 个人脸")
+        println("匹配到${reacts.size}个人脸")
         for (i in reacts.indices) {
             Imgproc.rectangle(
                 image,

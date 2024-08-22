@@ -27,7 +27,7 @@ object ocr {
             }
             System.load(lib.absolutePath)
         }
-        println("OpenCV: " + Core.VERSION)
+        println("OpenCV: ${Core.VERSION}")
     }
 
     @JvmStatic

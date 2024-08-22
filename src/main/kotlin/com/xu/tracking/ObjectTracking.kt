@@ -28,7 +28,7 @@ object ObjectTracking {
             }
             System.load(lib.absolutePath)
         }
-        println(Core.VERSION)
+        println("OpenCV: ${Core.VERSION}")
     }
 
     @JvmStatic
