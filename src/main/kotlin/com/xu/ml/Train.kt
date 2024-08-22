@@ -35,9 +35,9 @@ object Train {
         val (trainImages, trainLabels) = load("lib/data/image/train/")
         val (testImages, testLabels) = load("lib/data/image/predict/")
 
-        // 创建和训练模型
+        // 梯度提升树
         val model = DTrees.create()
-        model.maxDepth = 50
+        model.maxDepth = 20
         model.minSampleCount = 2
         model.useSurrogates = false
         model.cvFolds = 0
@@ -57,13 +57,13 @@ object Train {
         model.train(trainImagesData, Ml.ROW_SAMPLE, trainLabelsData)
         model.save("lib/data/image/ml/DTrees.xml")
 
-        // 练集准确率
+        // 评估训练集准确率
         val train = accuracy(model, trainImages, trainLabels)
-        println("Training Accuracy: $train")
+        println("训练集准确率: $train")
 
-        // 试集准确率
+        // 评估测试集准确率
         val test = accuracy(model, testImages, testLabels)
-        println("Test Accuracy: $test")
+        println("测试集准确率: $test")
     }
 
     /**

@@ -1,13 +1,14 @@
 package com.xu.com.xu.image
 
-import org.bytedeco.opencv.global.opencv_highgui
-import org.bytedeco.opencv.global.opencv_imgcodecs.imread
-import org.bytedeco.opencv.global.opencv_imgproc.resize
-import org.bytedeco.opencv.opencv_core.Mat
-import org.bytedeco.opencv.opencv_core.Rect
-import org.bytedeco.opencv.opencv_core.Size
 import org.opencv.core.Core
 import org.opencv.core.CvType
+import org.opencv.core.Mat
+import org.opencv.core.MatOfFloat
+import org.opencv.core.MatOfPoint
+import org.opencv.core.Scalar
+import org.opencv.core.Size
+import org.opencv.highgui.HighGui
+import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import org.opencv.ml.DTrees
 import java.io.File
@@ -31,34 +32,111 @@ object ocr {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        // 读取图片
-        val src = imread("C:\\Users\\xuyq\\Desktop\\1.png")
-        // 鼠标框选区域
-        val roi: Rect? = opencv_highgui.selectROI("ROI", src, false, false, false)
-        opencv_highgui.destroyWindow("ROI")
-        if (roi == null) {
-            return
+        ocr()
+    }
+
+    fun ocr() {
+        val image = Imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\1.png")
+
+        val gray = Mat()
+        Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY)
+
+        val binary = Mat()
+        Imgproc.adaptiveThreshold(
+            gray,
+            binary,
+            255.0,
+            Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
+            Imgproc.THRESH_BINARY_INV,
+            11,
+            2.0
+        )
+
+        val contours = mutableListOf<MatOfPoint>()
+        val hierarchy = Mat()
+        Imgproc.findContours(binary, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
+
+        // 使用决策树进行识别
+        val ml = DTrees.load("lib/data/image/ml/DTrees.xml")
+        for (contour in contours) {
+            val rect = Imgproc.boundingRect(contour)
+            // 过滤小区域
+            if (rect.width > 28 && rect.height > 28) {
+                rect.width += 15
+                rect.height += 15
+                val mat = Mat(gray, rect)
+                Imgproc.resize(mat, mat, Size(28.0, 28.0))
+
+                val float = MatOfFloat()
+                mat.convertTo(float, CvType.CV_32FC1)
+
+                val ocr = Mat(1, 28 * 28, CvType.CV_32FC1)
+                float.copyTo(ocr.row(0))
+
+                val result = ml.predict(float, Mat())
+                println("识别结果：${result.toInt()}")
+
+                Imgproc.rectangle(image, rect, Scalar(0.0, 255.0, 0.0), 2)
+            }
+        }
+        HighGui.imshow("src", image)
+        HighGui.waitKey(0)
+    }
+
+    private fun contour() {
+        //1 获取原图
+        val src = Imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\1.png")
+        //2 图片灰度化
+        val gary = Mat()
+        Imgproc.cvtColor(src, gary, Imgproc.COLOR_RGB2GRAY)
+        //3 图像边缘处理
+        val edges = Mat()
+        Imgproc.Canny(gary, edges, 1.0, 1.0, 7, true)
+        //4 发现轮廓
+        val list = ArrayList<MatOfPoint>()
+        Imgproc.findContours(edges, list, Mat(), Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE)
+        //5 绘制轮廓
+        for (i in 0 until list.size) {
+            Imgproc.drawContours(src, list, i, Scalar(0.0, 255.0, 0.0), 1, Imgproc.LINE_AA)
+        }
+        HighGui.imshow("src", src)
+        HighGui.waitKey(0)
+    }
+
+
+    fun test() {
+        val image = Imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\1.png")
+
+        val gray = Mat()
+        Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY)
+
+        val binary = Mat()
+        Imgproc.adaptiveThreshold(
+            gray,
+            binary,
+            255.0,
+            Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
+            Imgproc.THRESH_BINARY_INV,
+            11,
+            2.0
+        )
+
+        val contours = mutableListOf<MatOfPoint>()
+        val hierarchy = Mat()
+        Imgproc.findContours(binary, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
+
+        for (contour in contours) {
+            val rect = Imgproc.boundingRect(contour)
+
+            // 过滤小区域
+            if (rect.width > 10 && rect.height > 10) {
+                Imgproc.rectangle(image, rect, Scalar(0.0, 255.0, 0.0), 2)
+            }
         }
 
-        val dst = Mat(src, roi)
-        resize(dst, dst, Size(28, 28))
-        val newMat = dst.reshape(0,1)
-        newMat.total().toInt()
+        HighGui.imshow("src", image)
+        HighGui.waitKey(0)
 
-        val images = intArrayOf(1, 2, 3, 4, 5, 6)
-        //images.add(array.map.toIntArray())
-
-        // 创建和训练模型
-        val model = DTrees.load("lib/data/image/ml/DTrees.xml")
-        val sample = org.opencv.core.Mat(1, 784, CvType.CV_32F)
-
-        sample.put(0, 0, images)
-
-        val response = model.predict(sample)
-        println(response.toInt())
-
-        opencv_highgui.imshow("DST", dst)
-        opencv_highgui.waitKey(1)
     }
 
 }
