@@ -42,6 +42,7 @@ object ocr {
         Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY)
 
         val binary = Mat()
+        // 灰度图像自适应阈值二值化
         Imgproc.adaptiveThreshold(
             gray,
             binary,
@@ -54,14 +55,16 @@ object ocr {
 
         val contours = mutableListOf<MatOfPoint>()
         val hierarchy = Mat()
+        // 检测图像中的轮廓
         Imgproc.findContours(binary, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
 
         // 使用决策树进行识别
         val ml = DTrees.load("lib/data/image/ml/DTrees.xml")
         for (contour in contours) {
+            // 计算并返回包围特定点集或轮廓的最小矩形边框
             val rect = Imgproc.boundingRect(contour)
             // 过滤小区域
-            if (rect.width > 28 && rect.height > 28) {
+            if (rect.width > 28 || rect.height > 28) {
                 rect.x -= 15
                 rect.y -= 15
                 rect.width += 30
