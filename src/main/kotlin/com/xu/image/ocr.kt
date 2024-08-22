@@ -27,7 +27,7 @@ object ocr {
             }
             System.load(lib.absolutePath)
         }
-        println(Core.VERSION)
+        println("OpenCV: " + Core.VERSION)
     }
 
     @JvmStatic
@@ -62,8 +62,11 @@ object ocr {
             val rect = Imgproc.boundingRect(contour)
             // 过滤小区域
             if (rect.width > 28 && rect.height > 28) {
-                rect.width += 15
-                rect.height += 15
+                rect.x -= 15
+                rect.y -= 15
+                rect.width += 30
+                rect.height += 30
+
                 val mat = Mat(gray, rect)
                 Imgproc.resize(mat, mat, Size(28.0, 28.0))
 
