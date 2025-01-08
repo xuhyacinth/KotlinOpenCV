@@ -174,8 +174,8 @@ fun convertAudioToMp3(inputPath: String, outputPath: String) {
 }
 
 fun main() {
-    val inputFile = "C:\\Users\\xuyq\\Desktop\\3.wav"  // 替换为你的输入文件路径
-    val outputFile = "C:\\Users\\xuyq\\Desktop\\3.mp3"  // 替换为你想要的输出文件路径
+    val inputFile = "C:\\Users\\hyacinth\\Desktop\\3.wav"  // 替换为你的输入文件路径
+    val outputFile = "C:\\Users\\hyacinth\\Desktop\\3.mp3"  // 替换为你想要的输出文件路径
 
     convertAudioToMp3(inputFile, outputFile)
     println("Conversion completed: $outputFile")

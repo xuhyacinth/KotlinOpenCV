@@ -28,7 +28,7 @@ object Contour {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        val image = Imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\1.png")
+        val image = Imgcodecs.imread("C:\\Users\\hyacinth\\Desktop\\1.png")
 
         val gray = Mat()
         Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY)

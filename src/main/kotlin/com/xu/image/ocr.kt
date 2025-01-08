@@ -36,7 +36,7 @@ object ocr {
     }
 
     fun ocr() {
-        val image = Imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\1.png")
+        val image = Imgcodecs.imread("C:\\Users\\hyacinth\\Desktop\\1.png")
 
         val gray = Mat()
         Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY)
@@ -91,7 +91,7 @@ object ocr {
 
     private fun contour() {
         //1 获取原图
-        val src = Imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\1.png")
+        val src = Imgcodecs.imread("C:\\Users\\hyacinth\\Desktop\\1.png")
         //2 图片灰度化
         val gary = Mat()
         Imgproc.cvtColor(src, gary, Imgproc.COLOR_RGB2GRAY)
@@ -111,7 +111,7 @@ object ocr {
 
 
     fun test() {
-        val image = Imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\1.png")
+        val image = Imgcodecs.imread("C:\\Users\\hyacinth\\Desktop\\1.png")
 
         val gray = Mat()
         Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY)

@@ -3,6 +3,7 @@ package com.xu.com.xu.image
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.opencv.global.opencv_core
 import org.bytedeco.opencv.global.opencv_highgui
+import org.bytedeco.opencv.global.opencv_imgcodecs
 import org.bytedeco.opencv.global.opencv_imgproc
 import org.bytedeco.opencv.opencv_core.Mat
 import org.bytedeco.opencv.opencv_core.Point
@@ -38,12 +39,55 @@ object Drawing {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        change()
+        //change()
+        click()
+    }
+
+    private fun click() {
+        // 创建画布(白色背景)
+        val image = opencv_imgcodecs.imread("C:\\Users\\hyacinth\\Desktop\\1.png")
+        if (image == null || image.empty()) {
+            println("Error: Could not read the image.")
+            return
+        }
+        val windowName = "Kotlin Mouse Drawing"
+
+        // 创建窗口
+        opencv_highgui.namedWindow(windowName, opencv_highgui.WINDOW_AUTOSIZE)
+
+        // 创建鼠标回调对象
+        val mouseCallback = object : MouseCallback() {
+            override fun call(event: Int, x: Int, y: Int, flags: Int, params: Pointer?) {
+                when (event) {
+                    opencv_highgui.EVENT_LBUTTONDOWN -> {
+                        println("点击点: ($x, $y)")
+
+                        // 在原图上绘制点
+                        opencv_imgproc.circle(
+                            image, Point(x, y), 5,
+                            Scalar(0.0, 0.0, 255.0, 0.0), -1, opencv_imgproc.LINE_AA, 0
+                        )
+                        opencv_highgui.imshow(windowName, image)
+                    }
+                }
+            }
+        }
+
+        // 设置鼠标回调
+        opencv_highgui.setMouseCallback(windowName, mouseCallback, null)
+
+        // 主循环
+        while (true) {
+            opencv_highgui.imshow(windowName, image)
+            if (opencv_highgui.waitKey(1).toChar() == 27.toChar()) {
+                break
+            }
+        }
     }
 
     private fun change() {
         // 创建画布(白色背景)
-        val image = Mat(700, 1000, opencv_core.CV_8UC3, Scalar(255.0, 255.0, 255.0, 0.0))
+        val image = Mat(700, 1300, opencv_core.CV_8UC3, Scalar(255.0, 255.0, 255.0, 0.0))
         val windowName = "Kotlin Mouse Drawing"
 
         // 创建窗口
