@@ -1,6 +1,7 @@
 package com.xu.com.xu.image
 
 import org.bytedeco.javacpp.FloatPointer
+import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.opencv.global.opencv_core
 import org.bytedeco.opencv.global.opencv_highgui
@@ -33,12 +34,52 @@ object Change {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        modify()
+        change()
     }
+
+
+    private fun change() {
+        // 读取图像
+        val src = opencv_imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\1.png")
+        if (src == null || src.empty()) {
+            return
+        }
+
+        val org = Point2f()
+        org.put<IntPointer>(Point2f(0f, 0f))
+        org.put<IntPointer>(Point2f(src.cols().toFloat(), 0f))
+        org.put<IntPointer>(Point2f(0f, src.rows().toFloat()))
+        org.put<IntPointer>(Point2f(src.cols().toFloat(), src.rows().toFloat()))
+
+
+        val dst = Point2f()
+        dst.put<IntPointer>(Point2f(src.cols().toFloat(), src.rows().toFloat()))
+        dst.put<IntPointer>(Point2f(src.cols().toFloat() * 0.1f, src.rows().toFloat() * 0.8f))
+        dst.put<IntPointer>(Point2f(src.cols().toFloat() * 0.7f, src.rows().toFloat() * 0.3f))
+        dst.put<IntPointer>(Point2f(0f, 0f))
+
+        // 获取透视变换矩阵
+        val matrix = opencv_imgproc.getPerspectiveTransform(dst, org)
+
+        // 应用透视变换
+        val output = Mat(src.size())
+        opencv_imgproc.warpPerspective(
+            src,
+            output,
+            matrix,
+            src.size()
+        )
+
+        // 显示结果
+        opencv_highgui.imshow("Perspective Transform", output)
+        opencv_highgui.waitKey(0)
+
+    }
+
 
     private fun modify() {
         // 读取图像
-        val src = opencv_imgcodecs.imread("C:\\Users\\hyacinth\\Desktop\\1.png")
+        val src = opencv_imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\11.png")
         if (src == null || src.empty()) {
             println("Error: Could not read the image.")
             return
@@ -46,6 +87,13 @@ object Change {
 
         println("Image width: ${src.cols()}")
         println("Image height: ${src.rows()}")
+
+
+        val org = Point2f()
+        org.put<FloatPointer>(Point2f(0f, 0f))
+        org.put<FloatPointer>(Point2f(src.cols().toFloat(), 0f))
+        org.put<FloatPointer>(Point2f(0f, src.rows().toFloat()))
+        org.put<FloatPointer>(Point2f(src.cols().toFloat(), src.rows().toFloat()))
 
         // 创建源点矩阵
         val point1 = Mat(1, 4, opencv_core.CV_32FC2)  // 注意这里改为 1x4 矩阵
@@ -55,8 +103,10 @@ object Change {
             FloatPointer(Point2f(0f, src.rows().toFloat())),// 左下
             FloatPointer(Point2f(src.cols().toFloat(), src.rows().toFloat()))// 右下
         )
+        var dst = Point2f()
         for (i in srcPoints.indices) {
             point1.ptr(0, i).put<FloatPointer>(srcPoints[i])
+            org.put<FloatPointer>(Point2f(srcPoints[i]))
         }
 
         // 创建目标点矩阵
@@ -67,14 +117,14 @@ object Change {
         }
 
         // 获取透视变换矩阵
-        val transformMatrix = opencv_imgproc.getPerspectiveTransform(point1, point2)
+        val matrix = opencv_imgproc.getPerspectiveTransform(dst, org)
 
         // 应用透视变换
         val output = Mat()
         opencv_imgproc.warpPerspective(
             src,
             output,
-            transformMatrix,
+            matrix,
             src.size()
         )
 
