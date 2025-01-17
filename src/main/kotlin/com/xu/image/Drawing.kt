@@ -1,5 +1,6 @@
 package com.xu.com.xu.image
 
+import org.bytedeco.javacpp.Loader
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.opencv.global.opencv_core
 import org.bytedeco.opencv.global.opencv_highgui
@@ -9,24 +10,11 @@ import org.bytedeco.opencv.opencv_core.Mat
 import org.bytedeco.opencv.opencv_core.Point
 import org.bytedeco.opencv.opencv_core.Scalar
 import org.bytedeco.opencv.opencv_highgui.MouseCallback
-import org.opencv.core.Core
-import java.io.File
-import java.util.*
 
 object Drawing {
 
     init {
-        val os = System.getProperty("os.name")
-        val type = System.getProperty("sun.arch.data.model")
-        if (os.uppercase(Locale.getDefault()).contains("WINDOWS")) {
-            val lib = if (type.endsWith("64")) {
-                File("lib\\opencv-4.9\\x64\\" + System.mapLibraryName(Core.NATIVE_LIBRARY_NAME))
-            } else {
-                File("lib\\opencv-4.9\\x86\\" + System.mapLibraryName(Core.NATIVE_LIBRARY_NAME))
-            }
-            System.load(lib.absolutePath)
-        }
-        println("OpenCV: ${Core.VERSION}")
+        Loader.load(opencv_core::class.java)
     }
 
     // 使用 Kotlin 的数据类来存储鼠标状态
@@ -39,103 +27,88 @@ object Drawing {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        //change()
-        click()
+        line()
+        //point()
     }
 
-    private fun click() {
-        // 创建画布(白色背景)
-        val image = opencv_imgcodecs.imread("C:\\Users\\hyacinth\\Desktop\\1.png")
+    /** 鼠标点击 */
+    private fun point() {
+        val image = opencv_imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\1.png")
         if (image == null || image.empty()) {
-            println("Error: Could not read the image.")
             return
         }
-        val windowName = "Kotlin Mouse Drawing"
-
+        val window = "Drawing"
         // 创建窗口
-        opencv_highgui.namedWindow(windowName, opencv_highgui.WINDOW_AUTOSIZE)
-
+        opencv_highgui.namedWindow(window, opencv_highgui.WINDOW_AUTOSIZE)
         // 创建鼠标回调对象
-        val mouseCallback = object : MouseCallback() {
+        val callback = object : MouseCallback() {
             override fun call(event: Int, x: Int, y: Int, flags: Int, params: Pointer?) {
                 when (event) {
                     opencv_highgui.EVENT_LBUTTONDOWN -> {
-                        println("点击点: ($x, $y)")
-
                         // 在原图上绘制点
                         opencv_imgproc.circle(
                             image, Point(x, y), 5,
                             Scalar(0.0, 0.0, 255.0, 0.0), -1, opencv_imgproc.LINE_AA, 0
                         )
-                        opencv_highgui.imshow(windowName, image)
+                        opencv_highgui.imshow(window, image)
                     }
                 }
             }
         }
-
         // 设置鼠标回调
-        opencv_highgui.setMouseCallback(windowName, mouseCallback, null)
-
+        opencv_highgui.setMouseCallback(window, callback, null)
         // 主循环
         while (true) {
-            opencv_highgui.imshow(windowName, image)
+            opencv_highgui.imshow(window, image)
             if (opencv_highgui.waitKey(1).toChar() == 27.toChar()) {
                 break
             }
         }
     }
 
-    private fun change() {
+    /** 鼠标画画 */
+    private fun line() {
         // 创建画布(白色背景)
         val image = Mat(700, 1300, opencv_core.CV_8UC3, Scalar(255.0, 255.0, 255.0, 0.0))
-        val windowName = "Kotlin Mouse Drawing"
-
+        val window = "Drawing"
         // 创建窗口
-        opencv_highgui.namedWindow(windowName, opencv_highgui.WINDOW_AUTOSIZE)
-
+        opencv_highgui.namedWindow(window, opencv_highgui.WINDOW_AUTOSIZE)
         // 创建状态对象
         val state = MouseState(image)
-
         // 创建鼠标回调对象
-        val mouseCallback = object : MouseCallback() {
+        val callback = object : MouseCallback() {
             override fun call(event: Int, x: Int, y: Int, flags: Int, params: Pointer?) {
                 when (event) {
+                    // 鼠标按钮按下
                     opencv_highgui.EVENT_LBUTTONDOWN -> {
                         state.drawing = true
                         state.first.x(x)
                         state.first.y(y)
                     }
-
+                    // 移动
                     opencv_highgui.EVENT_MOUSEMOVE -> {
                         if (state.drawing) {
                             state.second.x(x)
                             state.second.y(y)
                             // 画线(红色)
-                            opencv_imgproc.line(
-                                image,
-                                state.first,
-                                state.second,
-                                Scalar(0.0, 0.0, 255.0, 0.0)
-                            )
+                            opencv_imgproc.line(image, state.first, state.second, Scalar(0.0, 0.0, 255.0, 0.0))
                             // 更新起点
                             state.first.x(state.second.x())
                             state.first.y(state.second.y())
                         }
                     }
-
+                    // 鼠标按钮回弹
                     opencv_highgui.EVENT_LBUTTONUP -> {
                         state.drawing = false
                     }
                 }
             }
         }
-
         // 设置鼠标回调
-        opencv_highgui.setMouseCallback(windowName, mouseCallback, null)
-
+        opencv_highgui.setMouseCallback(window, callback, null)
         // 主循环
         while (true) {
-            opencv_highgui.imshow(windowName, image)
+            opencv_highgui.imshow(window, image)
             if (opencv_highgui.waitKey(1).toChar() == 27.toChar()) {
                 break
             }
