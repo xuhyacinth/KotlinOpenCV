@@ -23,65 +23,34 @@ object Change {
         modify()
     }
 
-
+    /** 透视变换 */
     private fun modify() {
         // 读取图像
-        val src = opencv_imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\11.png")
+        val src = opencv_imgcodecs.imread("C:\\Users\\hyacinth\\Desktop\\11.png")
         if (src == null || src.empty()) {
             return
         }
-
-        // 创建源点矩阵
-        val org = Point2f(4)
-        // 左上
-        org.position(0).put(Point2f(0f, 0f))
-        // 右上
-        org.position(1).put(Point2f(src.cols().toFloat(), 0f))
-        // 左下
-        org.position(2).put(Point2f(src.cols().toFloat(), src.rows().toFloat()))
-        // 右下
-        org.position(3).put(Point2f(0f, src.rows().toFloat()))
-
-        // 创建目标点矩阵
-        val dst = Point2f(4)
+        // 创建源点矩阵4个点
+        val org = Mat(1, 4, opencv_core.CV_32FC2)
+        org.ptr(0, 0).put<Pointer>(Point2f(0f, 0f))
+        org.ptr(0, 1).put<Pointer>(Point2f(src.cols().toFloat(), 0f))
+        org.ptr(0, 2).put<Pointer>(Point2f(src.cols().toFloat(), src.rows().toFloat()))
+        org.ptr(0, 3).put<Pointer>(Point2f(0f, src.rows().toFloat()))
+        // 创建目标点矩阵4个点
+        val dst = Mat(1, 4, opencv_core.CV_32FC2)
         val target = click(src)
         for (i in target.indices) {
-            dst.position(i.toLong()).put(target[i])
+            dst.ptr(0, i).put<Pointer>(target[i])
         }
-
         // 获取透视变换矩阵
-        val matrix = opencv_imgproc.getPerspectiveTransform(org, dst)
-
+        val matrix = opencv_imgproc.getPerspectiveTransform(dst, org)
         // 应用透视变换
         val images = Mat()
         opencv_imgproc.warpPerspective(src, images, matrix, src.size())
-
-        // 打印源点和目标点的坐标
-        org.position(0)
-        for (i in 0..3) {
-            println("Source point $i: (${org.x()}, ${org.y()})")
-            org.position((i + 1).toLong())
-        }
-
-        dst.position(0)
-        for (i in 0..3) {
-            println("Destination point $i: (${dst.x()}, ${dst.y()})")
-            dst.position((i + 1).toLong())
-        }
-
-        println("Transformation Matrix:")
-        for (i in 0 until matrix.rows()) {
-            for (j in 0 until matrix.cols()) {
-                print("${matrix.ptr(i, j).get()} ")
-            }
-            println()
-        }
-
         // 显示结果
         opencv_highgui.imshow("DST", images)
         opencv_highgui.waitKey(0)
     }
-
 
     private fun click(image: Mat): List<Point2f> {
         // 创建画布(白色背景)

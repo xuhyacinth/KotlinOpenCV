@@ -33,7 +33,7 @@ object Drawing {
 
     /** 鼠标点击 */
     private fun point() {
-        val image = opencv_imgcodecs.imread("C:\\Users\\xuyq\\Desktop\\1.png")
+        val image = opencv_imgcodecs.imread("C:\\Users\\hyacinth\\Desktop\\1.png")
         if (image == null || image.empty()) {
             return
         }
