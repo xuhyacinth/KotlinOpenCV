@@ -35,7 +35,11 @@ object Drawing {
         //point()
     }
 
-    /** 画矩形 */
+    /**
+     * 画矩形
+     *
+     * @since 2025年1月20日12点33分
+     */
     private fun rectangle() {
         // 创建画布(白色背景)
         val image = Mat(700, 1300, opencv_core.CV_8UC3, Scalar(255.0, 255.0, 255.0, 0.0))
@@ -101,8 +105,11 @@ object Drawing {
         }
     }
 
-
-    /** 鼠标点击 */
+    /**
+     * 鼠标画圆形
+     *
+     * @since 2025年1月20日12点33分
+     */
     private fun point() {
         val image = opencv_imgcodecs.imread("C:\\Users\\hyacinth\\Desktop\\1.png")
         if (image == null || image.empty()) {
@@ -137,7 +144,11 @@ object Drawing {
         }
     }
 
-    /** 鼠标画画 */
+    /**
+     * 鼠标画线条
+     *
+     * @since 2025年1月20日12点33分
+     */
     private fun line() {
         // 创建画布(白色背景)
         val image = Mat(700, 1300, opencv_core.CV_8UC3, Scalar(255.0, 255.0, 255.0, 0.0))
