@@ -1,5 +1,7 @@
 package com.xu.com.xu.tracking
 
+import org.bytedeco.javacpp.Loader
+import org.bytedeco.opencv.global.opencv_core
 import org.bytedeco.opencv.global.opencv_highgui
 import org.bytedeco.opencv.global.opencv_imgproc
 import org.bytedeco.opencv.opencv_core.Mat
@@ -9,25 +11,12 @@ import org.bytedeco.opencv.opencv_core.Scalar
 import org.bytedeco.opencv.opencv_video.Tracker
 import org.bytedeco.opencv.opencv_video.TrackerMIL
 import org.bytedeco.opencv.opencv_videoio.VideoCapture
-import org.opencv.core.Core
-import java.io.File
-import java.util.*
 
 
 object Tracking {
 
     init {
-        val os = System.getProperty("os.name")
-        val type = System.getProperty("sun.arch.data.model")
-        if (os.uppercase(Locale.getDefault()).contains("WINDOWS")) {
-            val lib = if (type.endsWith("64")) {
-                File("lib\\opencv-4.9\\x64\\" + System.mapLibraryName(Core.NATIVE_LIBRARY_NAME))
-            } else {
-                File("lib\\opencv-4.9\\x86\\" + System.mapLibraryName(Core.NATIVE_LIBRARY_NAME))
-            }
-            System.load(lib.absolutePath)
-        }
-        println("OpenCV: ${Core.VERSION}")
+        Loader.load(opencv_core::class.java)
     }
 
     @JvmStatic
@@ -40,6 +29,7 @@ object Tracking {
         val roi: Rect? = opencv_highgui.selectROI("roi", first, false, false, false)
         opencv_highgui.destroyWindow("roi")
         // 创建跟踪器
+        //val tracker: TrackerCSRT = TrackerCSRT.create()
         val tracker: Tracker = TrackerMIL.create()
         tracker.init(first, roi)
         while (video.read(first)) {
@@ -60,3 +50,4 @@ object Tracking {
     }
 
 }
+
