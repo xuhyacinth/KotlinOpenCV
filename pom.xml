@@ -48,13 +48,13 @@
             <version>1.9.0-RC</version>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>org.opencv</groupId>-->
-        <!--            <artifactId>opencv</artifactId>-->
-        <!--            <version>4100</version>-->
-        <!--            <scope>system</scope>-->
-        <!--            <systemPath>${project.basedir}/lib/opencv/opencv-4100.jar</systemPath>-->
-        <!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.opencv</groupId>-->
+<!--            <artifactId>opencv</artifactId>-->
+<!--            <version>4100</version>-->
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${project.basedir}/lib/opencv-4.10/opencv-4100.jar</systemPath>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.bytedeco</groupId>
